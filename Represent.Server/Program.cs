@@ -1,9 +1,34 @@
+using System.Security.Claims;
+using AspNet.Security.OAuth.Strava;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Configuration
+    .AddUserSecrets<Program>();
+
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/auth/signin";
+        options.LogoutPath = "/auth/signout";
+    })
+    .AddStrava(options =>
+    {
+        options.ClientId = builder.Configuration["Strava:ClientId"];
+        options.ClientSecret = builder.Configuration["Strava:ClientSecret"];
+        options.SaveTokens = true;
+    });
 
 var app = builder.Build();
 
@@ -19,31 +44,34 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapPost("/auth/signin", () =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    return Results.Challenge(
+        new AuthenticationProperties { RedirectUri = "/" },
+        [StravaAuthenticationDefaults.AuthenticationScheme]);
+});
 
-app.MapGet("/api/weatherforecast", () =>
+app.MapPost("/auth/signout", () =>
 {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+    return Results.SignOut(
+        new AuthenticationProperties { RedirectUri = "/" },
+        [CookieAuthenticationDefaults.AuthenticationScheme]);
+});
+
+app.MapGet("/api/user", (ClaimsPrincipal user) =>
+{
+    if (!user.Identity.IsAuthenticated)
+    {
+        return null;
+    }
+
+    return user.Claims.Select(claim => new { claim.Type, claim.Value }).ToArray();
+});
+
 
 app.MapFallbackToFile("/index.html");
 
-app.Run();
+app.UseAuthentication();
+//app.UseAuthorization();
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+app.Run();

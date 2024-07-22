@@ -43,7 +43,19 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '^/weatherforecast': {
+            '^/api': {
+                target,
+                secure: false
+            },
+            '^/auth/signin': {
+                target,
+                secure: false
+            },
+            '^/auth/signout': {
+                target,
+                secure: false
+            },
+            '^/signin-strava': {
                 target,
                 secure: false
             }
