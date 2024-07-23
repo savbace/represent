@@ -1,7 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
+import { User, UserContext } from "./Context";
 
-export default function Auth() {
-  const [user, setUser] = useState<object>();
+interface AuthProps {
+  onSignin(user: User): void;
+}
+
+export default function Auth({ onSignin }: AuthProps) {
+  const user = useContext(UserContext);
 
   useEffect(() => {
     fetchUserInfo();
@@ -9,17 +14,19 @@ export default function Auth() {
     async function fetchUserInfo() {
       const response = await fetch("/api/user");
       const data = await response.json();
-      setUser(data);
+      onSignin(data);
     }
   }, []);
 
   if (user) {
     return (
       <section>
+        <p>
+          Hello, <b>{user.name}</b>!
+        </p>
         <form method="POST" action="/auth/signout">
-        <button type="submit">Sign out</button>
-      </form>
-        <pre>{JSON.stringify(user, null, 2)}</pre>
+          <button type="submit">Sign out</button>
+        </form>
       </section>
     );
   }

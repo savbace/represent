@@ -42,6 +42,8 @@ export async function demoDraw(activity: ActivityInfo, canvas: HTMLCanvasElement
   if (activity.photos?.length) {
     const backImg = await downloadImage(activity.photos[0]);
     drawer.drawImage(backImg, getSquareFillOptions(backImg, drawer.getWidth(), drawer.getHeight()));
+  } else {
+    drawer.fillBackground("#202020");
   }
 
   drawCoordinates(drawer, activity.polylineMap);
@@ -81,21 +83,18 @@ export async function demoDraw(activity: ActivityInfo, canvas: HTMLCanvasElement
   drawer.drawText(distance, textBaselineX, textBaselineY + 40, fontSize, fontColor);
 
   // elevation
-  drawer.drawText("Elev Gain", drawer.getWidth() / 2, textBaselineY, fontSize * 0.5, fontColor);
-  drawer.drawText(`${activity.elevationGain} m`, drawer.getWidth() / 2, textBaselineY + 40, fontSize, fontColor);
+  drawer.drawText("Elev Gain", drawer.getWidth() / 2 - 100, textBaselineY, fontSize * 0.5, fontColor);
+  drawer.drawText(`${activity.elevationGain} m`, drawer.getWidth() / 2 - 100, textBaselineY + 40, fontSize, fontColor);
 
   // pace
   // const pace = Duration.fromObject({ seconds: activity.movingTime / distanceKm });
   // drawer.drawText("Pace", (drawer.getWidth() - 100) / 2, textBaselineY, fontSize * 0.5, fontColor);
   // drawer.drawText(pace.toFormat("mm:ss '/km'"), (drawer.getWidth() - 100) / 2, textBaselineY + 40, fontSize, fontColor);
+  const duration = Duration.fromObject({ seconds: activity.movingTime });
+  const oneHour = Duration.fromObject({ hour: 1 });
+  const timeFormatted =
+    duration.valueOf() < oneHour.valueOf() ? duration.toFormat("mm'm' ss's'") : duration.toFormat("hh'h' mm'm' ss's'");
 
   drawer.drawText("Time", drawer.getWidth() - textBaselineX, textBaselineY, fontSize * 0.5, fontColor, "right");
-  drawer.drawText(
-    Duration.fromObject({ seconds: activity.movingTime }).toFormat("mm'm' ss's'"),
-    drawer.getWidth() - textBaselineX,
-    textBaselineY + 40,
-    fontSize,
-    fontColor,
-    "right"
-  );
+  drawer.drawText(timeFormatted, drawer.getWidth() - textBaselineX, textBaselineY + 40, fontSize, fontColor, "right");
 }

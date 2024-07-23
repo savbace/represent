@@ -2,6 +2,8 @@ using System.Security.Claims;
 using AspNet.Security.OAuth.Strava;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Represent.Server.Authentication;
+using StravaSharp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,11 @@ builder.Services
     {
         options.ClientId = builder.Configuration["Strava:ClientId"];
         options.ClientSecret = builder.Configuration["Strava:ClientSecret"];
+
+        options.Scope.Add("activity:read");
+        options.Scope.Add("activity:read_all");
+        options.Scope.Add("profile:read_all");
+
         options.SaveTokens = true;
     });
 
@@ -65,7 +72,23 @@ app.MapGet("/api/user", (ClaimsPrincipal user) =>
         return null;
     }
 
-    return user.Claims.Select(claim => new { claim.Type, claim.Value }).ToArray();
+    return new
+    {
+        Name = user.FindFirstValue(ClaimTypes.Name)
+    };
+});
+
+app.MapGet("/api/activities", async (HttpContext context) =>
+{
+    var token = await context.GetTokenAsync("access_token");
+    var client = new Client(new StaticAuthenticator(token));
+    // now you can use the Client
+    var activities = await client.Activities.GetAthleteActivities(1, 1);
+    var latest = activities.FirstOrDefault();
+
+    var details = await client.Activities.Get(latest.Id, false);
+
+    return details;
 });
 
 

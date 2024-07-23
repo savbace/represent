@@ -51,6 +51,12 @@ export default class CanvasDrawer {
     ctx.fillText(text, x, y);
   }
 
+  fillBackground(color: string){
+    const ctx = this.canvas.getContext("2d")!;
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, this.getWidth(), this.getHeight());
+  }
+
   // todo: getViewport/drawingArea
   getWidth() {
     return this.canvas.width;
