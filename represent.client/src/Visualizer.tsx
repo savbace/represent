@@ -16,6 +16,7 @@ interface Activity {
     primary: {
       urls: {
         small: string;
+        medium: string;
       };
     };
   };
@@ -51,7 +52,7 @@ export default function Visualizer() {
         startDate: activity.startDate,
         polylineMap: activity.map.summaryPolyline,
         elevationGain: activity.totalElevationGain,
-        photos: activity.photos.primary?.urls?.small ? [activity.photos.primary?.urls?.small] : [],
+        photos: activity.photos.primary?.urls?.medium ? [activity.photos.primary?.urls?.medium] : [],
       };
       demoDraw(activityInfo, canvasRef.current!);
       setInitialized(true);

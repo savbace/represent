@@ -16,6 +16,9 @@ builder.Configuration
     .AddUserSecrets<Program>();
 
 builder.Services
+    .ConfigureHttpJsonOptions(options => options.SerializerOptions.IncludeFields = true); // for PhotoUrl struct
+
+builder.Services
     .AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
