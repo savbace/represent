@@ -1,5 +1,6 @@
 import { useContext, useEffect } from "react";
 import { User, UserContext } from "./Context";
+import ConnectWithStrava from "./assets/btn_strava_connectwith_orange.svg";
 
 interface AuthProps {
   onSignin(user: User): void;
@@ -25,7 +26,9 @@ export default function Auth({ onSignin }: AuthProps) {
           Hello, <b>{user.name}</b>!
         </p>
         <form method="POST" action="/auth/signout">
-          <button type="submit">Sign out</button>
+          <button className="shadow-md" type="submit">
+            Sign out
+          </button>
         </form>
       </section>
     );
@@ -34,7 +37,9 @@ export default function Auth({ onSignin }: AuthProps) {
   return (
     <section>
       <form method="POST" action="/auth/signin">
-        <button type="submit">Sign in</button>
+        <button type="submit" className="opacity-80 hover:opacity-100">
+          <img src={ConnectWithStrava} />
+        </button>
       </form>
     </section>
   );
