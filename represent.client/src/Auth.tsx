@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 import { User, UserContext } from "./Context";
 import ConnectWithStrava from "./assets/btn_strava_connectwith_orange.svg";
+import { Button } from "@nextui-org/react";
 
 interface AuthProps {
   onSignin(user: User): void;
@@ -26,9 +27,9 @@ export default function Auth({ onSignin }: AuthProps) {
           Hello, <b>{user.name}</b>!
         </p>
         <form method="POST" action="/auth/signout">
-          <button className="shadow-md" type="submit">
+          <Button type="submit" color="warning">
             Sign out
-          </button>
+          </Button>
         </form>
       </section>
     );
@@ -37,9 +38,9 @@ export default function Auth({ onSignin }: AuthProps) {
   return (
     <section>
       <form method="POST" action="/auth/signin">
-        <button type="submit" className="opacity-80 hover:opacity-100">
+        <Button type="submit" variant="solid" radius="none" className="h-fit w-fit bg-inherit p-0">
           <img src={ConnectWithStrava} />
-        </button>
+        </Button>
       </form>
     </section>
   );
