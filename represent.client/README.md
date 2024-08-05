@@ -1,5 +1,17 @@
 # Dev
 
+## Tasks/Ideas
+- [ ] Select from the latest top N activities
+- [ ] Select uploaded image.
+- [ ] Add different templates of stats representation.
+    - Exclude/include stats (pace, date, elev etc).
+    - Add emoji.
+- [ ] Uploaded image from file.
+- [ ] Use map as a background.
+
+## API
+https://developers.strava.com/
+
 ## Clients
 - https://github.com/rfoel/strava
 - https://github.com/gabornemeth/StravaSharp
@@ -15,10 +27,21 @@
 - [Strava API - How to get route image](https://stackoverflow.com/a/53377017/1276058)
 - https://github.com/mapbox/polyline
 - [React Leaflet with Strava API tutorial](https://www.youtube.com/watch?v=lxrchC0iDHs)
-- https://www.npmjs.com/package/leaflet-image
+- https://www.npmjs.com/package/leaflet-image (OUTDATED?)
 - https://docs.mapbox.com/api/maps/static-images/
 - [Plotting Strava data with Python](https://nddoornekamp.medium.com/plotting-strava-data-with-python-7aaf0cf0a9c3)
 
+# Existing alternatives
+ - https://moqop.com/about (can't add custom picture, no date etc.)
+ - https://www.cartorion.com/ (good one, but aimed for printing)
+ - https://www.heatflask.com/ (motion)
+ - https://www.workoutsnap.com/ (iOS only)
+ - https://marcbaldwin.github.io/velographic/ (iOS only)
+ - https://stravify.com/ (a lot of stats)
+ - https://statshunters.com/ (advanced tool: heatmap, art, stats etc.)
+ - https://alfanla.com/stralizer/ (nice set of templates ❗)
+
+ ---
 
 # React + TypeScript + Vite
 
