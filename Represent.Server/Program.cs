@@ -2,6 +2,7 @@ using System.Security.Claims;
 using AspNet.Security.OAuth.Strava;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Net.Http.Headers;
 using Represent.Server.Authentication;
 using StravaSharp;
 
@@ -27,6 +28,24 @@ builder.Services
     {
         options.LoginPath = "/auth/signin";
         options.LogoutPath = "/auth/signout";
+
+        static bool IsAjaxRequest(HttpRequest request) => string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal)
+            || string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
+
+        // fix: https://github.com/dotnet/aspnetcore/issues/9039
+        options.Events.OnRedirectToLogin += context =>
+        {
+            if (IsAjaxRequest(context.Request) || context.Request.Path.StartsWithSegments("/api"))
+            {
+                context.Response.Headers.Location = context.RedirectUri;
+                context.Response.StatusCode = 401;
+            }
+            else
+            {
+                context.Response.Redirect(context.RedirectUri);
+            }
+            return Task.CompletedTask;
+        };
     })
     .AddStrava(options =>
     {
@@ -39,6 +58,8 @@ builder.Services
 
         options.SaveTokens = true;
     });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -79,7 +100,8 @@ app.MapGet("/api/user", (ClaimsPrincipal user) =>
     {
         Name = user.FindFirstValue(ClaimTypes.Name)
     };
-});
+})
+.RequireAuthorization();
 
 app.MapGet("/api/activities", async (HttpContext context) =>
 {
@@ -92,12 +114,13 @@ app.MapGet("/api/activities", async (HttpContext context) =>
     var details = await client.Activities.Get(latest.Id, false);
 
     return details;
-});
+})
+.RequireAuthorization();
 
 
 app.MapFallbackToFile("/index.html");
 
 app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthorization();
 
 app.Run();
