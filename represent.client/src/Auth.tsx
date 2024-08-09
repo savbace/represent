@@ -1,24 +1,9 @@
-import { useContext, useEffect } from "react";
-import { User, UserContext } from "./Context";
-import ConnectWithStrava from "./assets/btn_strava_connectwith_orange.svg";
 import { Button } from "@nextui-org/react";
+import ConnectWithStrava from "./assets/btn_strava_connectwith_orange.svg";
+import { useUser } from "./services/hooks";
 
-interface AuthProps {
-  onSignin(user: User): void;
-}
-
-export default function Auth({ onSignin }: AuthProps) {
-  const user = useContext(UserContext);
-
-  useEffect(() => {
-    fetchUserInfo();
-
-    async function fetchUserInfo() {
-      const response = await fetch("/api/user");
-      const data = await response.json();
-      onSignin(data);
-    }
-  }, []);
+export default function Auth() {
+  const { user } = useUser();
 
   if (user) {
     return (

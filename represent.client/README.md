@@ -4,9 +4,9 @@
 - [ ] Select from the latest top N activities
 - [ ] Select uploaded image.
 - [ ] Add different templates of stats representation.
-    - Exclude/include stats (pace, date, elev etc).
-    - Add emoji.
-- [ ] Uploaded image from file.
+  - Exclude/include stats (pace, date, elev etc).
+  - Add emoji.
+- [ ] Upload image from file.
 - [ ] Use map as a background.
 
 ## API

@@ -1,44 +1,13 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import useSWR from "swr";
 import { demoDraw } from "./RouteDrawing";
 import ActivityInfo from "./engine/ActivityInfo";
-import { UserContext } from "./Context";
-
-interface Activity {
-  name: string;
-  distance: number;
-  movingTime: number;
-  startDate: string;
-  totalElevationGain: number;
-  map: {
-    summaryPolyline: string;
-  };
-  photos: {
-    primary: {
-      urls: {
-        small: string;
-        medium: string;
-      };
-    };
-  };
-}
+import { Activity, fetcher } from "./services/api";
 
 export default function Visualizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const user = useContext(UserContext);
-  const [activity, setActivity] = useState<Activity>();
+  const { data: activity } = useSWR<Activity>("/api/activities", fetcher);
   const [initialized, setInitialized] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (user && !activity) {
-      fetchActivities();
-    }
-
-    async function fetchActivities() {
-      const response = await fetch("/api/activities");
-      const data = await response.json();
-      setActivity(data);
-    }
-  }, [activity, user]);
 
   useEffect(() => {
     if (activity && !initialized) {
