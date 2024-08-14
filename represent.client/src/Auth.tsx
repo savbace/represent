@@ -7,12 +7,12 @@ export default function Auth() {
 
   if (user) {
     return (
-      <section>
+      <section className="m-4">
         <p>
           Hello, <b>{user.name}</b>!
         </p>
         <form method="POST" action="/auth/signout">
-          <Button type="submit" color="warning">
+          <Button type="submit" color="danger">
             Sign out
           </Button>
         </form>

@@ -103,20 +103,26 @@ app.MapGet("/api/user", (ClaimsPrincipal user) =>
 })
 .RequireAuthorization();
 
-app.MapGet("/api/activities", async (HttpContext context) =>
+app.MapGet("/api/activities/summary", async (HttpContext context) =>
 {
     var token = await context.GetTokenAsync("access_token");
     var client = new Client(new StaticAuthenticator(token));
     // now you can use the Client
-    var activities = await client.Activities.GetAthleteActivities(1, 1);
-    var latest = activities.FirstOrDefault();
+    var activities = await client.Activities.GetAthleteActivities(1, 10);
 
-    var details = await client.Activities.Get(latest.Id, false);
+    return activities;
+})
+.RequireAuthorization();
+
+app.MapGet("/api/activities/{id:long}", async (long id, HttpContext context) =>
+{
+    var token = await context.GetTokenAsync("access_token");
+    var client = new Client(new StaticAuthenticator(token));
+    var details = await client.Activities.Get(id, false);
 
     return details;
 })
 .RequireAuthorization();
-
 
 app.MapFallbackToFile("/index.html");
 

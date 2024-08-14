@@ -8,6 +8,7 @@
   - Add emoji.
 - [ ] Upload image from file.
 - [ ] Use map as a background.
+- [ ] Copy/save image. Workaround: Right-click -> Copy Image. ISSUE: https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
 
 ## API
 https://developers.strava.com/
