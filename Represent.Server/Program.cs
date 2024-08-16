@@ -3,7 +3,6 @@ using System.Text.Json;
 using AspNet.Security.OAuth.Strava;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Represent.Server.Authentication;
 using StravaSharp;
@@ -117,8 +116,5 @@ activities.MapGet("/{id:long}", async (long id, HttpContext context) =>
 });
 
 app.MapFallbackToFile("/index.html");
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.Run();
