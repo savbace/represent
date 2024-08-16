@@ -1,7 +1,9 @@
 using System.Security.Claims;
+using System.Text.Json;
 using AspNet.Security.OAuth.Strava;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Represent.Server.Authentication;
 using StravaSharp;
@@ -12,12 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Configuration
-    .AddUserSecrets<Program>();
-
-builder.Services
-    .ConfigureHttpJsonOptions(options => options.SerializerOptions.IncludeFields = true); // for PhotoUrl struct
 
 builder.Services
     .AddAuthentication(options =>
@@ -91,11 +87,6 @@ app.MapPost("/auth/signout", () =>
 
 app.MapGet("/api/user", (ClaimsPrincipal user) =>
 {
-    if (!user.Identity.IsAuthenticated)
-    {
-        return null;
-    }
-
     return new
     {
         Name = user.FindFirstValue(ClaimTypes.Name)
@@ -103,7 +94,9 @@ app.MapGet("/api/user", (ClaimsPrincipal user) =>
 })
 .RequireAuthorization();
 
-app.MapGet("/api/activities/summary", async (HttpContext context) =>
+var activities = app.MapGroup("/api/activities").RequireAuthorization();
+
+activities.MapGet("/summary", async (HttpContext context) =>
 {
     var token = await context.GetTokenAsync("access_token");
     var client = new Client(new StaticAuthenticator(token));
@@ -111,18 +104,17 @@ app.MapGet("/api/activities/summary", async (HttpContext context) =>
     var activities = await client.Activities.GetAthleteActivities(1, 10);
 
     return activities;
-})
-.RequireAuthorization();
+});
 
-app.MapGet("/api/activities/{id:long}", async (long id, HttpContext context) =>
+activities.MapGet("/{id:long}", async (long id, HttpContext context) =>
 {
     var token = await context.GetTokenAsync("access_token");
     var client = new Client(new StaticAuthenticator(token));
     var details = await client.Activities.Get(id, false);
 
-    return details;
-})
-.RequireAuthorization();
+    // for PhotoUrl struct
+    return Results.Json(details, new JsonSerializerOptions(JsonSerializerDefaults.Web) { IncludeFields = true });
+});
 
 app.MapFallbackToFile("/index.html");
 
