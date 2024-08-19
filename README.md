@@ -11,7 +11,8 @@ Generate sharable picture of Strava activity.
   - Add emoji.
 - [ ] Upload image from file.
 - [ ] Use map as a background.
-- [ ] Copy/save image. Workaround: Right-click -> Copy Image. ISSUE: https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
+- [ ] Settings: sizes for canvas, polyline, fonts, colors etc.
+- [x] Copy/save image. Workaround: Right-click -> Copy Image. ISSUE: https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
 - [ ] Migrate to auth to [OpenIddict](https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers?tab=readme-ov-file#migrating-to-openiddict).
 
 ## API
