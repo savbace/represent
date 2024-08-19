@@ -1,9 +1,9 @@
-import { DateTime, Duration } from "luxon";
 import StravaLogo from "./assets/strava-logo.svg";
 import ActivityInfo from "./engine/ActivityInfo";
 import CanvasDrawer from "./engine/CanvasDrawer";
 import { scaleIntoRect } from "./engine/Geometry";
 import { polylineToCanvasPoints } from "./engine/Route";
+import { formatDate, formatDistance, formatDuration } from "./utils/formatting";
 
 export function drawCoordinates(drawer: CanvasDrawer, polyline: string) {
   const scale = 0.9;
@@ -68,18 +68,10 @@ export async function demoDraw(activity: ActivityInfo, canvas: HTMLCanvasElement
   const fontColor = "white";
 
   drawer.drawText(activity.name, textBaselineX, textBaselineY - 50, fontSize * 0.7, fontColor);
-  drawer.drawText(
-    DateTime.fromISO(activity.startDate).toLocaleString(DateTime.DATE_MED),
-    drawer.getWidth() - textBaselineX,
-    50,
-    fontSize,
-    fontColor,
-    "right"
-  );
+  drawer.drawText(formatDate(activity.startDate), drawer.getWidth() - textBaselineX, 50, fontSize, fontColor, "right");
 
   drawer.drawText("Run", textBaselineX, textBaselineY, fontSize * 0.5, fontColor);
-  const distanceKm = activity.distance / 1000;
-  const distance = `${distanceKm.toFixed(2)} km`;
+  const distance = formatDistance(activity.distance);
   drawer.drawText(distance, textBaselineX, textBaselineY + 40, fontSize, fontColor);
 
   // elevation
@@ -90,11 +82,7 @@ export async function demoDraw(activity: ActivityInfo, canvas: HTMLCanvasElement
   // const pace = Duration.fromObject({ seconds: activity.movingTime / distanceKm });
   // drawer.drawText("Pace", (drawer.getWidth() - 100) / 2, textBaselineY, fontSize * 0.5, fontColor);
   // drawer.drawText(pace.toFormat("mm:ss '/km'"), (drawer.getWidth() - 100) / 2, textBaselineY + 40, fontSize, fontColor);
-  const duration = Duration.fromObject({ seconds: activity.movingTime });
-  const oneHour = Duration.fromObject({ hour: 1 });
-  const timeFormatted =
-    duration.valueOf() < oneHour.valueOf() ? duration.toFormat("mm'm' ss's'") : duration.toFormat("hh'h' mm'm' ss's'");
-
+  const timeFormatted = formatDuration(activity.movingTime);
   drawer.drawText("Time", drawer.getWidth() - textBaselineX, textBaselineY, fontSize * 0.5, fontColor, "right");
   drawer.drawText(timeFormatted, drawer.getWidth() - textBaselineX, textBaselineY + 40, fontSize, fontColor, "right");
 }

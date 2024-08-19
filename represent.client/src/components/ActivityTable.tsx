@@ -1,16 +1,8 @@
-import {
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow
-} from "@nextui-org/react";
-import { DateTime, Duration } from "luxon";
+import { Chip, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/react";
+import { useCallback } from "react";
 import useSWR from "swr";
 import { Activity, fetcher } from "../services/api";
-import { useCallback } from "react";
+import { formatDate, formatDistance, formatDuration } from "../utils/formatting";
 
 const columns = [
   {
@@ -22,8 +14,16 @@ const columns = [
     label: "DATE",
   },
   {
+    key: "distance",
+    label: "DISTANCE",
+  },
+  {
     key: "movingTime",
     label: "DURATION",
+  },
+  {
+    key: "photos",
+    label: "PHOTOS",
   },
 ];
 
@@ -31,22 +31,24 @@ interface ActivityTableProps {
   onSelected(id: number): void;
 }
 
-
-export default function ActivityTable({onSelected}: ActivityTableProps) {
+export default function ActivityTable({ onSelected }: ActivityTableProps) {
   const { data, isLoading } = useSWR<Activity[]>("/api/activities/summary", fetcher);
 
   const renderCell = useCallback((activity: Activity, columnKey: React.Key) => {
     const cellValue = activity[columnKey as keyof Activity];
 
     switch (columnKey) {
-      case "name":
-        return cellValue as string;
       case "startDate": {
-        return DateTime.fromISO(activity.startDate).toLocaleString(DateTime.DATE_MED);
+        return formatDate(activity.startDate);
+      }
+      case "distance": {
+        return formatDistance(activity.distance);
       }
       case "movingTime": {
-        const duration = Duration.fromObject({ seconds: activity.movingTime });
-        return duration.toFormat("mm'm' ss's'");
+        return formatDuration(activity.movingTime);
+      }
+      case "photos": {
+        return activity.photoCount ? renderLabel("YES", "success") : renderLabel("NO", "warning");
       }
       default:
         return cellValue as string;
@@ -57,7 +59,15 @@ export default function ActivityTable({onSelected}: ActivityTableProps) {
     <Table
       aria-label="Activities table"
       selectionMode="single"
-      onRowAction={(key)=>onSelected(key as number)}
+      color="primary"
+      allowDuplicateSelectionEvents={false}
+      onSelectionChange={(keys) => {
+        const id = Array.from(keys)[0];
+
+        if (id) {
+          onSelected(Number(id));
+        }
+      }}
     >
       <TableHeader columns={columns}>
         {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
@@ -68,5 +78,13 @@ export default function ActivityTable({onSelected}: ActivityTableProps) {
         )}
       </TableBody>
     </Table>
+  );
+}
+
+function renderLabel(value: string, color: "success" | "warning") {
+  return (
+    <Chip color={color} variant="dot" size="sm">
+      {value}
+    </Chip>
   );
 }
