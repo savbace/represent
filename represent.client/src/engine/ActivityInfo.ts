@@ -5,5 +5,5 @@ export default interface ActivityInfo {
   startDate: string;
   polylineMap: string;
   elevationGain: number;
-  photos?: string[];
+  photoUrl?: string;
 }

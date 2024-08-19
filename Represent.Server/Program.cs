@@ -14,6 +14,8 @@ builder.Services
     .AddStravaAuthentication(builder.Configuration)
     .AddAuthorization();
 
+builder.Services.AddHttpClient();
+
 var app = builder.Build();
 
 app.UseDefaultFiles();

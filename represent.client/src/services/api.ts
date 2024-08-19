@@ -5,17 +5,8 @@ export interface Activity {
   movingTime: number;
   startDate: string;
   totalElevationGain: number;
-  map: {
-    summaryPolyline: string;
-  };
-  photos: {
-    primary: {
-      urls: {
-        small: string;
-        medium: string;
-      };
-    };
-  };
+  mapPolyline: string;
+  photoCount: number;
 }
 
 export interface User {
@@ -23,5 +14,4 @@ export interface User {
 }
 
 // @ts-expect-error "pass args 'as is'"
-export const fetcher = (...args) => fetch(...args).then(res => res.json());
-
+export const fetcher = (...args) => fetch(...args).then((res) => res.json());

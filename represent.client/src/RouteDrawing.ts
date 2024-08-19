@@ -39,8 +39,8 @@ function getSquareFillOptions(img: HTMLImageElement, width: number, height: numb
 
 export async function demoDraw(activity: ActivityInfo, canvas: HTMLCanvasElement) {
   const drawer = new CanvasDrawer(canvas);
-  if (activity.photos?.length) {
-    const backImg = await downloadImage(activity.photos[0]);
+  if (activity.photoUrl) {
+    const backImg = await downloadImage(activity.photoUrl);
     drawer.drawImage(backImg, getSquareFillOptions(backImg, drawer.getWidth(), drawer.getHeight()));
   } else {
     drawer.fillBackground("#202020");

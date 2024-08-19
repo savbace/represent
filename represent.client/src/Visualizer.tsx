@@ -1,3 +1,4 @@
+import { Button, Tooltip } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { demoDraw } from "./RouteDrawing";
@@ -8,6 +9,7 @@ import { Activity, fetcher } from "./services/api";
 export default function Visualizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activityId, setActivityId] = useState<number | undefined>();
+  const [copied, setCopied] = useState(false);
   const { data: activity } = useSWR<Activity>(activityId ? `/api/activities/${activityId}` : null, fetcher);
 
   useEffect(() => {
@@ -20,13 +22,30 @@ export default function Visualizer() {
         distance: activity.distance,
         movingTime: activity.movingTime,
         startDate: activity.startDate,
-        polylineMap: activity.map.summaryPolyline,
+        polylineMap: activity.mapPolyline,
         elevationGain: activity.totalElevationGain,
-        photos: activity.photos.primary?.urls?.medium ? [activity.photos.primary?.urls?.medium] : [],
+        photoUrl: activity.photoCount > 0 ? `/api/activities/${activity.id}/photo` : undefined,
       };
       demoDraw(activityInfo, canvasRef.current!);
     }
   }, [activity]);
+
+  const copyImage = () => {
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+
+      canvas.toBlob(async function (blob) {
+        const item = new ClipboardItem({ [blob!.type]: blob! });
+        await navigator.clipboard.write([item]);
+
+        setCopied(true);
+        // TODO: useRef and clearTimeout + custom coponent?
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      });
+    }
+  };
 
   return (
     <div>
@@ -35,6 +54,16 @@ export default function Visualizer() {
       </div>
       <div className="mb-4">
         <canvas ref={canvasRef}></canvas>
+      </div>
+
+      <div>
+        {canvasRef.current && (
+          <Tooltip content="Copied!" color="success" isOpen={copied} placement="right">
+            <Button color="primary" onClick={copyImage}>
+              Copy to clipboard
+            </Button>
+          </Tooltip>
+        )}
       </div>
     </div>
   );
