@@ -9,6 +9,11 @@ export interface Activity {
   photoCount: number;
 }
 
+export interface ActivityPhoto {
+  id: string;
+  url: string;
+}
+
 export interface User {
   name: string;
 }

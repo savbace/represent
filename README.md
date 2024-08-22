@@ -4,16 +4,17 @@
 Generate sharable picture of Strava activity.
 
 ## Tasks/Ideas
-- [ ] Select from the latest top N activities
-- [ ] Select uploaded image.
+- [x] Select from the latest top N activities
+- [x] Select uploaded image from activity.
 - [ ] Add different templates of stats representation.
   - Exclude/include stats (pace, date, elev etc).
   - Add emoji.
 - [ ] Upload image from file.
 - [ ] Use map as a background.
 - [ ] Settings: sizes for canvas, polyline, fonts, colors etc.
+- [ ] Find a way to minimize [429 Too Many Requests](https://developers.strava.com/docs/rate-limits/).
 - [x] Copy/save image. Workaround: Right-click -> Copy Image. ISSUE: https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
-- [ ] Migrate to auth to [OpenIddict](https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers?tab=readme-ov-file#migrating-to-openiddict).
+- [ ] Migrate auth to [OpenIddict](https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers?tab=readme-ov-file#migrating-to-openiddict).
 
 ## API
 https://developers.strava.com/

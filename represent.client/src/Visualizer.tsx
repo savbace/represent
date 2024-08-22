@@ -2,20 +2,31 @@ import { Button, Tooltip } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { demoDraw } from "./RouteDrawing";
+import ActivityPhotoPicker from "./components/ActivityPhotoPicker";
 import ActivityTable from "./components/ActivityTable";
 import ActivityInfo from "./engine/ActivityInfo";
 import { Activity, fetcher } from "./services/api";
+
+const canvasWidth = 650;
+const canvasHeight = 650;
 
 export default function Visualizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activityId, setActivityId] = useState<number | undefined>();
   const [copied, setCopied] = useState(false);
+  const [photoId, setPhotoId] = useState<string>();
   const { data: activity } = useSWR<Activity>(activityId ? `/api/activities/${activityId}` : null, fetcher);
 
   useEffect(() => {
     if (activity) {
-      canvasRef.current!.width = 700;
-      canvasRef.current!.height = 700;
+      canvasRef.current!.width = canvasWidth;
+      canvasRef.current!.height = canvasHeight;
+
+      let photoUrl = undefined;
+      if (activity.photoCount > 0) {
+        const photoApiUrl = `/api/activities/${activity.id}/photo-proxy`;
+        photoUrl = photoId ? `${photoApiUrl}?photoId=${encodeURIComponent(photoId)}` : photoApiUrl;
+      }
 
       const activityInfo: ActivityInfo = {
         name: activity.name,
@@ -24,11 +35,16 @@ export default function Visualizer() {
         startDate: activity.startDate,
         polylineMap: activity.mapPolyline,
         elevationGain: activity.totalElevationGain,
-        photoUrl: activity.photoCount > 0 ? `/api/activities/${activity.id}/photo` : undefined,
+        photoUrl: photoUrl,
       };
       demoDraw(activityInfo, canvasRef.current!);
     }
-  }, [activity]);
+  }, [activity, photoId]);
+
+  const onActivitySelected = (id: number) => {
+    setActivityId(id);
+    setPhotoId(undefined);
+  };
 
   const copyImage = () => {
     if (canvasRef.current) {
@@ -39,7 +55,7 @@ export default function Visualizer() {
         await navigator.clipboard.write([item]);
 
         setCopied(true);
-        // TODO: useRef and clearTimeout + custom coponent?
+        // TODO: useRef and clearTimeout + custom component?
         setTimeout(() => {
           setCopied(false);
         }, 2000);
@@ -47,24 +63,28 @@ export default function Visualizer() {
     }
   };
 
-  return (
-    <div>
-      <div className="mb-4">
-        <ActivityTable onSelected={setActivityId} />
-      </div>
-      <div className="mb-4">
-        <canvas ref={canvasRef}></canvas>
-      </div>
+  const hasMultiplePhotos = activity && activity.photoCount > 1;
 
+  return (
+    <div className="flex flex-row">
       <div>
+        <ActivityTable onSelected={onActivitySelected} />
+      </div>
+      <div className="mx-4">
+        <div className="min-h-[650px] min-w-[650px] border-2 border-dashed border-primary text-center align-middle">
+          {!canvasRef.current && <span className="text-xl text-neutral-500">Select activity to visualize.</span>}
+          <canvas ref={canvasRef}></canvas>
+        </div>
+
         {canvasRef.current && (
           <Tooltip content="Copied!" color="success" isOpen={copied} placement="right">
-            <Button color="primary" onClick={copyImage}>
+            <Button color="primary" onClick={copyImage} className="mt-2">
               Copy to clipboard
             </Button>
           </Tooltip>
         )}
       </div>
+      <div>{hasMultiplePhotos && <ActivityPhotoPicker activityId={activity.id} onSelected={setPhotoId} />}</div>
     </div>
   );
 }

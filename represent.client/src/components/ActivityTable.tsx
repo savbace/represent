@@ -48,7 +48,10 @@ export default function ActivityTable({ onSelected }: ActivityTableProps) {
         return formatDuration(activity.movingTime);
       }
       case "photos": {
-        return activity.photoCount ? renderLabel("YES", "success") : renderLabel("NO", "warning");
+        const multiple = activity.photoCount > 1;
+        return activity.photoCount
+          ? renderLabel("YES", multiple ? "secondary" : "success")
+          : renderLabel("NO", "warning");
       }
       default:
         return cellValue as string;
@@ -81,7 +84,7 @@ export default function ActivityTable({ onSelected }: ActivityTableProps) {
   );
 }
 
-function renderLabel(value: string, color: "success" | "warning") {
+function renderLabel(value: string, color: "success" | "warning" | "secondary") {
   return (
     <Chip color={color} variant="dot" size="sm">
       {value}

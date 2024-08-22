@@ -7,8 +7,8 @@ export default function Auth() {
 
   if (user) {
     return (
-      <section className="m-4">
-        <p>
+      <section className="m-4 text-center">
+        <p className="mb-2">
           Hello, <b>{user.name}</b>!
         </p>
         <form method="POST" action="/auth/signout">

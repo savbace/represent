@@ -62,7 +62,7 @@ export async function demoDraw(activity: ActivityInfo, canvas: HTMLCanvasElement
   drawer.drawImage(logoImg, logoOpts);
 
   const textBaselineX = 20;
-  const textBaselineY = 630;
+  const textBaselineY = drawer.getHeight() - 70;
 
   const fontSize = 40;
   const fontColor = "white";

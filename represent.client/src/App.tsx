@@ -8,7 +8,7 @@ function App() {
   return (
     <>
       <div className="container mx-auto flex flex-col items-center my-4">
-        <h1 className="my-5 text-center text-4xl">re:present</h1>
+        <h1 className="my-2 text-center text-4xl">re:present</h1>
         <Auth />
         {user && <Visualizer />}
       </div>

@@ -1,9 +1,9 @@
 ﻿using RestSharp;
 using RestSharp.Authenticators;
 
-namespace Represent.Server.Authentication;
+namespace Represent.Server.Strava;
 
-public class StaticAuthenticator(string token) : AuthenticatorBase(token)
+internal class StaticAuthenticator(string token) : AuthenticatorBase(token)
 {
     protected override ValueTask<Parameter> GetAuthenticationParameter(string accessToken)
     {
