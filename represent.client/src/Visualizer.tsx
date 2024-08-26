@@ -1,12 +1,13 @@
-import { Button, Tooltip } from "@nextui-org/react";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { draw } from "./RouteDrawing";
 import ActivityPhotoPicker from "./components/ActivityPhotoPicker";
 import ActivityTable from "./components/ActivityTable";
+import CopyImageButton from "./components/CopyImageButton";
 import Settings, { SettingsOptions } from "./components/Settings";
 import ActivityInfo from "./engine/ActivityInfo";
 import { Activity, fetcher } from "./services/api";
+import { copyToClipboard } from "./utils/canvasUtils";
 
 const canvasWidth = 650;
 const canvasHeight = 650;
@@ -19,7 +20,6 @@ const defaultSettings: SettingsOptions = {
 export default function Visualizer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activityId, setActivityId] = useState<number | undefined>();
-  const [copied, setCopied] = useState(false);
   const [photoId, setPhotoId] = useState<string>();
   const [settings, setSettings] = useState<SettingsOptions>(defaultSettings);
   const { data: activity } = useSWR<Activity>(activityId ? `/api/activities/${activityId}` : null, fetcher);
@@ -53,20 +53,9 @@ export default function Visualizer() {
     setPhotoId(undefined);
   };
 
-  const copyImage = () => {
+  const copyImage = async () => {
     if (canvasRef.current) {
-      const canvas = canvasRef.current;
-
-      canvas.toBlob(async function (blob) {
-        const item = new ClipboardItem({ [blob!.type]: blob! });
-        await navigator.clipboard.write([item]);
-
-        setCopied(true);
-        // TODO: useRef and clearTimeout + custom component?
-        setTimeout(() => {
-          setCopied(false);
-        }, 2000);
-      });
+      await copyToClipboard(canvasRef.current);
     }
   };
 
@@ -86,13 +75,7 @@ export default function Visualizer() {
           <canvas ref={canvasRef}></canvas>
         </div>
 
-        {canvasRef.current && (
-          <Tooltip content="Copied!" color="success" isOpen={copied} placement="right">
-            <Button color="primary" onClick={copyImage} className="mt-2">
-              Copy to clipboard
-            </Button>
-          </Tooltip>
-        )}
+        {canvasRef.current && <CopyImageButton onPress={copyImage} />}
       </div>
       <div>{hasMultiplePhotos && <ActivityPhotoPicker activityId={activity.id} onSelected={setPhotoId} />}</div>
     </div>
