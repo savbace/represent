@@ -1,17 +1,26 @@
-import StravaLogo from "./assets/strava-logo.svg";
+import StravaLogo from "./assets/strava-logo-ext.svg";
+import { SettingsOptions } from "./components/Settings";
 import ActivityInfo from "./engine/ActivityInfo";
 import CanvasDrawer from "./engine/CanvasDrawer";
 import { scaleIntoRect } from "./engine/Geometry";
 import { polylineToCanvasPoints } from "./engine/Route";
 import { formatDate, formatDistance, formatDuration } from "./utils/formatting";
 
-export function drawCoordinates(drawer: CanvasDrawer, polyline: string) {
+const colorMap = {
+  white: "#ffffff",
+  black: "#000000",
+  red: "#e71834",
+  blue: "#106cef",
+  green: "#41da68",
+};
+
+export function drawCoordinates(drawer: CanvasDrawer, polyline: string, color: string) {
   const scale = 0.9;
 
   const coordinatePoints = polylineToCanvasPoints(polyline);
   const points = scaleIntoRect(coordinatePoints, drawer.getWidth(), drawer.getHeight(), scale);
 
-  drawer.drawPoints(points, "red");
+  drawer.drawPoints(points, color);
 }
 
 function downloadImage(url: string): Promise<HTMLImageElement> {
@@ -37,7 +46,7 @@ function getSquareFillOptions(img: HTMLImageElement, width: number, height: numb
   };
 }
 
-export async function demoDraw(activity: ActivityInfo, canvas: HTMLCanvasElement) {
+export async function draw(activity: ActivityInfo, canvas: HTMLCanvasElement, settings: SettingsOptions) {
   const drawer = new CanvasDrawer(canvas);
   if (activity.photoUrl) {
     const backImg = await downloadImage(activity.photoUrl);
@@ -46,7 +55,7 @@ export async function demoDraw(activity: ActivityInfo, canvas: HTMLCanvasElement
     drawer.fillBackground("#202020");
   }
 
-  drawCoordinates(drawer, activity.polylineMap);
+  drawCoordinates(drawer, activity.polylineMap, colorMap[settings.routeColor]);
 
   const logoImg = await downloadImage(StravaLogo);
   const logoOpts = {
@@ -59,13 +68,18 @@ export async function demoDraw(activity: ActivityInfo, canvas: HTMLCanvasElement
     dw: 150,
     dh: 30,
   };
+
+  if (settings.textColor == "black") {
+    logoOpts.sy = 135;
+  }
+
   drawer.drawImage(logoImg, logoOpts);
 
   const textBaselineX = 20;
   const textBaselineY = drawer.getHeight() - 70;
 
   const fontSize = 40;
-  const fontColor = "white";
+  const fontColor = colorMap[settings.textColor];
 
   drawer.drawText(activity.name, textBaselineX, textBaselineY - 50, fontSize * 0.7, fontColor);
   drawer.drawText(formatDate(activity.startDate), drawer.getWidth() - textBaselineX, 50, fontSize, fontColor, "right");
