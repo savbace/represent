@@ -89,6 +89,6 @@ internal static class ActivitiesEndpoints
     {
         var token = await context.GetTokenAsync("access_token");
 
-        return new Client(new StaticAuthenticator(token));
+        return Client.Create(new StaticAuthenticator(token));
     }
 }
