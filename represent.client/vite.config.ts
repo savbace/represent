@@ -7,6 +7,7 @@ import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 
+// baseFolder directory must exist before starting the app
 const baseFolder =
     env.APPDATA !== undefined && env.APPDATA !== ''
         ? `${env.APPDATA}/ASP.NET/https`
@@ -26,7 +27,7 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
         'Pem',
         '--no-password',
     ], { stdio: 'inherit', }).status) {
-        throw new Error("Could not create certificate.");
+      throw new Error(`Could not create certificate at '${certFilePath}'.`);
     }
 }
 
